@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/pgChainage" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
