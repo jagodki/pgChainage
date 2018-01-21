@@ -14,7 +14,7 @@ version=1.0
 author=Christoph Jung
 email=jagodki.cj@gmail.com
 
-about=test
+about=source of the icon: Webalys - Kameleon Icons (http://www.kameleon.pics)
 
 tracker=https://github.com/jagodki/pgChainage/issues
 repository=https://github.com/jagodki/pgChainage
