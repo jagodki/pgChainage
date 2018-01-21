@@ -111,6 +111,13 @@
           </item>
          </layout>
         </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="pushButton_connect_to_database">
+          <property name="text">
+           <string>connect to database</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
@@ -273,6 +280,22 @@
     <hint type="sourcelabel">
      <x>251</x>
      <y>255</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>191</x>
+     <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_connect_to_database</sender>
+   <signal>clicked()</signal>
+   <receiver>pgChainageDialogBase</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>191</x>
+     <y>200</y>
     </hint>
     <hint type="destinationlabel">
      <x>191</x>
