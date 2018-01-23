@@ -27,6 +27,8 @@ import resources
 # Import the code for the dialog
 from pgchainage_dialog import pgChainageDialog
 import os.path
+# import own mdoules
+import src.PgcController as pgcc
 
 
 class pgChainage:
@@ -65,6 +67,9 @@ class pgChainage:
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'pgChainage')
         self.toolbar.setObjectName(u'pgChainage')
+        
+        #create a controller object for the specific functions of the plugin
+        self.controller = pgcc.PgcController(self.iface)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -191,3 +196,8 @@ class pgChainage:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
             pass
+
+    def connect_to_database(self):
+        self.controller.start_db_connection()
+        self.controller.populate_schema_combo_box()
+
