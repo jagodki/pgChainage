@@ -2,7 +2,6 @@ import db
 import time
 from PyQt4.QtGui import QcomboBox, QProgressBar
 from qgis.core import QgsVectorLayer, QgsDataSourceURI, QgsMapLayerRegistry
-from qgis.gui import QgsMessageBar
 
 class PgcController:
 	
@@ -10,7 +9,7 @@ class PgcController:
 		self.db = None
 		self.gui = gui
 	
-	def start_db_connection(self, host, port, user, password, database):
+	def start_db_connection(self, host, port, database, user, password):
 		self.db = Db(host, port, user, password, database)
 		self.db.start_connection(self.gui)
 		self.db.close_connection()
@@ -29,7 +28,7 @@ class PgcController:
 			combo_box.add_item(combo_item)
 		self.db.close_connection()
 	
-	def start_chainage(schema, table, id_column, geom_column, equidistance, crs, pb):
+	def start_chainage(schema, table, id_column, geom_column, equidistance, crs, pb, create_new_layer):
 		#establishing a database connection
 		self.db.start_connection(self.gui)
 		
@@ -52,8 +51,6 @@ class PgcController:
 		for id in list_of_ids:
 			self.db.chainage_line(schema, table, id_column, geom_column, chainage_schema, chainage_table, equidistance, crs)
 			pb.setValue(pb.getValue() + 1)
-		
-		gui.pushMessage("Info", "Chainage finished ^o^ - duration: " + str(time.time() - start_time), level=QgsMessageBar.INFO)
 		
 		#close database connection
 		self.db.close_connection()

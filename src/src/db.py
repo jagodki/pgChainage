@@ -58,13 +58,15 @@ class Db:
 		chainageSql =	"$DO$\n" +
 						"DECLARE" +
 						"current_fractional double precision := 0.0;\n" +
+						"current_number_of_point integer := 1;\n" +
 						"i record;\n" +
 						"BEGIN\n" +
 						"FOR i IN SELECT " + id_column + " as id_column, st_transform(" + geom_column + ", " + crs + ") as geom, st_length(st_transform(" + geom_column + ", " + crs + ")) as line_length FROM " + source_table + "." + source_table + " LOOP\n" +
 						"WHILE current_fractional < line_length LOOP\n" + 
-						"INSERT INTO " + target_schema + "." + target_table + "(old_id, geom)\n" +
-						"VALUES(i.id_column, st_line_interpolate_point(i.geom, current_fractional));\n" +
+						"INSERT INTO " + target_schema + "." + target_table + "(old_id, geom, number_on_line)\n" +
+						"VALUES(i.id_column, st_line_interpolate_point(i.geom, current_fractional, current_number_of_point));\n" +
 						"current_fractional := current_fractional + (equidistance / line_length);\n" +
+						"current_number_of_point := current_number_of_point + 1;\n" +
 						"END LOOP;\n" +
 						"END LOOP;\n" +
 						"$DO$"
@@ -82,7 +84,7 @@ class Db:
 		data_type = rows[0][0]
 		
 		#now create a new table
-		create_table_sql = "CREATE TABLE IF NOT EXISTS " + target_schema + "." + target_table + "(id serial PRIMARY KEY, old_id " + data_type + ");"
+		create_table_sql = "CREATE TABLE IF NOT EXISTS " + target_schema + "." + target_table + "(id serial PRIMARY KEY, old_id " + data_type + ", number_on_line integer);"
 		self.cur.execute(create_table_sql)
 		
 		#add a geometry column to the new table
