@@ -29,7 +29,7 @@ import os.path
 from qgis.gui import QgsMessageBar
 from qgis.core import QgsMessageLog
 # import own mdoules
-import src.PgcController as pgcc
+from src.pgc_controller import PgcController
 
 
 class pgChainage:
@@ -60,17 +60,19 @@ class pgChainage:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
+        # Create the dialog (after translation) and keep reference
+        self.dlg = pgChainageDialog()
 
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&pgChainage')
-        self.controller = pgcc.PgcController(self.iface)
+        self.controller = PgcController(self.iface)
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'pgChainage')
         self.toolbar.setObjectName(u'pgChainage')
         #connect signals and slots
-		self.dlg.pushButton_connect_to_database.clicked.connect(self.connect_to_database)
-		self.dlg.comboBox_schema.currentTextChanged.connect(self.select_tables)
+        self.dlg.pushButton_connect_to_database.clicked.connect(self.connect_to_database)
+        self.dlg.comboBox_schema.currentIndexChanged.connect(self.select_tables)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -126,7 +128,7 @@ class pgChainage:
         """
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = pgChainageDialog()
+        #self.dlg = pgChainageDialog()
 
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
@@ -200,21 +202,23 @@ class pgChainage:
 				e = sys.exc_info()[0]
 				self.iface.messageBar().pushMessage("Error", "A problem occured. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
 				QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
-
+    
     def connect_to_database(self):
-		try:
-			self.controller.start_db_connection(self.dlg.lineEdit_host.text(), self.dlg.lineEdit_port.text(), self.dlg.lineEdit_database.text(), self.dlg.lineEdit_user.text(), self.dlg.lineEdit_password.text())
-			self.controller.populate_schema_combo_box(self.dlg.comboBox_schema)
-		except:
-			e = sys.exc_info()[0]
-			self.iface.messageBar().pushMessage("Error", "Not able to query the schemata from the database. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
-			QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
-	
-	def select_tables(self):
-		try:
-			self.controller.populate_table_combo_box(self.dlg.comboBox_table, self.dlg.comboBox_schema.currentText())
-		except:
-			e = sys.exc_info()[0]
-			self.iface.messageBar().pushMessage("Error", "Not able to query the tables of the schema. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
-			QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
-	
+        try:
+            self.controller.start_db_connection(self.dlg.lineEdit_host.text(), self.dlg.lineEdit_port.text(), self.dlg.lineEdit_database.text(), self.dlg.lineEdit_user.text(), self.dlg.lineEdit_password.text())
+            self.controller.populate_schema_combo_box(self.dlg.comboBox_schema)
+            self.comboBox_table.clear()
+        except:
+            e = sys.exc_info()[0]
+            self.iface.messageBar().pushMessage("Error", "Not able to query the schemata from the database. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
+            QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
+            QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
+    
+    def select_tables(self):
+        try:
+            self.controller.populate_table_combo_box(self.dlg.comboBox_table, self.dlg.comboBox_schema.currentText())
+        except:
+            e = sys.exc_info()[0]
+            self.iface.messageBar().pushMessage("Error", "Not able to query the tables of the schema. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
+            QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
+

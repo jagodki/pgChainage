@@ -1,6 +1,6 @@
 import db
 import time
-from PyQt4.QtGui import QcomboBox, QProgressBar
+from PyQt4.QtGui import QComboBox, QProgressBar
 from qgis.core import QgsVectorLayer, QgsDataSourceURI, QgsMapLayerRegistry
 
 class PgcController:
@@ -16,14 +16,14 @@ class PgcController:
 	
 	def populate_schema_combo_box(self, combo_box):
 		self.db.start_connection(self.gui)
-		combo_items[] = self.db.get_all_schemata()
+		combo_items = self.db.get_all_schemata()
 		for combo_item in combo_items:
 			combo_box.add_item(combo_item)
 		self.db.close_connection()
 	
 	def populate_table_combo_box(self, combo_box, schema):
 		self.db.start_connection(self.gui)
-		combo_items[] = self.db.get_all_tables(schema)
+		combo_items = self.db.get_all_tables(schema)
 		for combo_item in combo_items:
 			combo_box.add_item(combo_item)
 		self.db.close_connection()

@@ -55,7 +55,7 @@ class Db:
 		return result_list
 	
 	def chainage_line(self, source_schema, source_table, id_column, geom_column, target_schema, target_table, equidistance, crs):
-		chainageSql =	"$DO$\n" +
+		chainageSql =	("$DO$\n" +
 						"DECLARE" +
 						"current_fractional double precision := 0.0;\n" +
 						"current_number_of_point integer := 1;\n" +
@@ -69,7 +69,7 @@ class Db:
 						"current_number_of_point := current_number_of_point + 1;\n" +
 						"END LOOP;\n" +
 						"END LOOP;\n" +
-						"$DO$"
+						"$DO$")
 		self.cur.execute(chainageSql)
 	
 	def create_target_schema_and_table(self, target_schema, target_table, source_schema, source_table, source_id_column, crs, create_new_layer):
