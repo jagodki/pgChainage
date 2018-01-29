@@ -1,4 +1,4 @@
-import psycopg2
+import psycopg2, sys, traceback
 from qgis.gui import QgsMessageBar
 from qgis.core import QgsMessageLog
 
@@ -18,11 +18,11 @@ class Db:
 			self.conn = psycopg2.connect(self.database, self.user, self.password, self.host, self.port)
 			self.conn.autocommit = true
 			self.cur = self.conn.cursor
-			gui.pushMessage("Info", "Connection to database can be established.", level=QgsMessageBar.INFO, duration = 5)
+			gui.messageBar().pushMessage("Info", "Connection to database can be established.", level=QgsMessageBar.INFO, duration = 5)
 		except:
 			e = sys.exc_info()[0]
-			gui.pushMessage("Error", "Establishing a connection to the database failed. Look into the QGIS-log for the stack trace.", level=QgsMessageBar.CRITICAL)
-			QgsMessageLog.logMessage(e, level=QgsMessageLog.CRITICAL)
+			gui.messageBar().pushMessage("Error", "Establishing a connection to the database failed. Look into the QGIS-log for the stack trace.", level=QgsMessageBar.CRITICAL)
+			QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
 	
 	def close_connection(self):
 		self.conn.close()

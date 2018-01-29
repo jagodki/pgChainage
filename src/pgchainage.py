@@ -28,6 +28,7 @@ from pgchainage_dialog import pgChainageDialog
 import os.path
 from qgis.gui import QgsMessageBar
 from qgis.core import QgsMessageLog
+import sys, traceback
 # import own mdoules
 from src.pgc_controller import PgcController
 
@@ -196,7 +197,14 @@ class pgChainage:
 				crs = self.dlg.lineEdit_crs.text()
 				
 				#start processing
-				self.controller.start_chainage(schema, table, id_column, geom_column, equidistance, crs, self.dlg.progessBar, self.dlg.chechBox_create_new_layer.isChecked())
+				self.controller.start_chainage(self.dlg.comboBox_schema.currentText(),
+                                               self.dlg.comboBox_table.currentText(),
+                                               self.dlg.lineEdit_id.text(),
+                                               self.dlg.lineEdit_geom.text(),
+                                               self.dlg.lineEdit_equidistance.text(),
+                                               self.dlg.lineEdit_crs.text(),
+                                               self.dlg.progressBar,
+                                               self.dlg.checkBox_create_new_layer.isChecked())
 				self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^", level=QgsMessageBar.INFO, duration=5)
 			except:
 				e = sys.exc_info()[0]
