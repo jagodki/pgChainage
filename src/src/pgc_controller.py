@@ -1,5 +1,4 @@
 import db
-import time
 from PyQt4.QtGui import QComboBox, QProgressBar
 from qgis.core import QgsVectorLayer, QgsDataSourceURI, QgsMapLayerRegistry
 
@@ -31,9 +30,6 @@ class PgcController:
 	def start_chainage(schema, table, id_column, geom_column, equidistance, crs, pb, create_new_layer):
 		#establishing a database connection
 		self.database.start_connection(self.gui)
-		
-		#get the start time
-		start_time = time.time()
 		
 		#define the names of the new schema and table
 		chainage_schema = "chainage"

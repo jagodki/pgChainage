@@ -15,14 +15,19 @@ class Db:
 	
 	def start_connection(self, gui):
 		try:
-			self.conn = psycopg2.connect(self.database, self.user, self.password, self.host, self.port)
+			#define connection string
+			conn_string = "host=" + self.host + " port=" + self.port + " dbname=" + self.database + " user=" + self.user + " password=" + self.password
+			
+			#create connection
+			self.conn = psycopg2.connect(conn_string)
 			self.conn.autocommit = true
 			self.cur = self.conn.cursor
+			
+			#display information to the user
 			gui.messageBar().pushMessage("Info", "Connection to database can be established.", level=QgsMessageBar.INFO, duration = 5)
 		except:
-			e = sys.exc_info()[0]
 			gui.messageBar().pushMessage("Error", "Establishing a connection to the database failed. Look into the QGIS-log for the stack trace.", level=QgsMessageBar.CRITICAL)
-			QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
+			QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
 	
 	def close_connection(self):
 		self.conn.close()
