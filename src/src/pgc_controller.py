@@ -17,14 +17,14 @@ class PgcController:
 		self.database.start_connection(self.gui)
 		combo_items = self.database.get_all_schemata()
 		for combo_item in combo_items:
-			combo_box.add_item(combo_item)
+			combo_box.addItem(combo_item)
 		self.database.close_connection()
 	
 	def populate_table_combo_box(self, combo_box, schema):
 		self.database.start_connection(self.gui)
 		combo_items = self.database.get_all_tables(schema)
 		for combo_item in combo_items:
-			combo_box.add_item(combo_item)
+			combo_box.addItem(combo_item)
 		self.database.close_connection()
 	
 	def start_chainage(schema, table, id_column, geom_column, equidistance, crs, pb, create_new_layer):

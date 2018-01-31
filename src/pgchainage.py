@@ -72,8 +72,8 @@ class pgChainage:
         self.toolbar = self.iface.addToolBar(u'pgChainage')
         self.toolbar.setObjectName(u'pgChainage')
         #connect signals and slots
-        self.dlg.pushButton_connect_to_database.clicked.connect(self.connect_to_database)
-        self.dlg.comboBox_schema.currentIndexChanged.connect(self.select_tables)
+        self.dlg.pushButton_connect_to_database.clicked.connect(self.connect_to_database())
+        self.dlg.comboBox_schema.currentIndexChanged.connect(self.select_tables())
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -185,42 +185,30 @@ class pgChainage:
         # See if OK was pressed
         if result:
 			try:
-				#read the user input
-				host = self.dlg.lineEdit_host.text()
-				port = self.dlg.lineEdit_port.text()
-				database = self.dlg.lineEdit_database.text()
-				user = self.dlg.lineEdit_user.text()
-				password = self.dlg.lineEdit_password.text()
-				schema = self.dlg.comboBox_schema.currentText()
-				table = self.dlg.comboBox_table.currentText()
-				equidistance = self.dlg.lineEdit_equidistance.text()
-				crs = self.dlg.lineEdit_crs.text()
-				
 				#start processing
 				self.controller.start_chainage(self.dlg.comboBox_schema.currentText(),
-                                               self.dlg.comboBox_table.currentText(),
-                                               self.dlg.lineEdit_id.text(),
-                                               self.dlg.lineEdit_geom.text(),
-                                               self.dlg.lineEdit_equidistance.text(),
-                                               self.dlg.lineEdit_crs.text(),
-                                               self.dlg.progressBar,
-                                               self.dlg.checkBox_create_new_layer.isChecked())
+											   self.dlg.comboBox_table.currentText(),
+											   self.dlg.lineEdit_id.text(),
+											   self.dlg.lineEdit_geom.text(),
+											   self.dlg.lineEdit_equidistance.text(),
+											   self.dlg.lineEdit_crs.text(),
+											   self.dlg.progressBar,
+											   self.dlg.checkBox_create_new_layer.isChecked())
 				self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^", level=QgsMessageBar.INFO, duration=5)
 			except:
 				e = sys.exc_info()[0]
 				self.iface.messageBar().pushMessage("Error", "A problem occured. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
-				QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
+				QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
     
     def connect_to_database(self):
         try:
             self.controller.start_db_connection(self.dlg.lineEdit_host.text(), self.dlg.lineEdit_port.text(), self.dlg.lineEdit_database.text(), self.dlg.lineEdit_user.text(), self.dlg.lineEdit_password.text())
             self.controller.populate_schema_combo_box(self.dlg.comboBox_schema)
-            self.comboBox_table.clear()
+            self.dlg.comboBox_table.clear()
         except:
             e = sys.exc_info()[0]
             self.iface.messageBar().pushMessage("Error", "Not able to query the schemata from the database. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
-            QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
-            QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
+            QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
     
     def select_tables(self):
         try:
@@ -228,5 +216,4 @@ class pgChainage:
         except:
             e = sys.exc_info()[0]
             self.iface.messageBar().pushMessage("Error", "Not able to query the tables of the schema. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
-            QgsMessageLog.logMessage(traceback.print_exc(), level=QgsMessageLog.CRITICAL)
-
+            QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
