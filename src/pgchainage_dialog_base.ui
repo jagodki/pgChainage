@@ -278,37 +278,5 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>comboBox_schema</sender>
-   <signal>currentTextChanged(QString)</signal>
-   <receiver>pgChainageDialogBase</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>251</x>
-     <y>255</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>191</x>
-     <y>263</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_connect_to_database</sender>
-   <signal>clicked()</signal>
-   <receiver>pgChainageDialogBase</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>191</x>
-     <y>200</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>191</x>
-     <y>263</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
 </ui>

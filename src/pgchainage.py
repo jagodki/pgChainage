@@ -72,8 +72,8 @@ class pgChainage:
         self.toolbar = self.iface.addToolBar(u'pgChainage')
         self.toolbar.setObjectName(u'pgChainage')
         #connect signals and slots
-        self.dlg.pushButton_connect_to_database.clicked.connect(self.connect_to_database())
-        self.dlg.comboBox_schema.currentIndexChanged.connect(self.select_tables())
+        self.dlg.pushButton_connect_to_database.clicked.connect(self.connect_to_database)
+        self.dlg.comboBox_schema.currentIndexChanged.connect(self.select_tables)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -203,15 +203,18 @@ class pgChainage:
     def connect_to_database(self):
         try:
             self.controller.start_db_connection(self.dlg.lineEdit_host.text(), self.dlg.lineEdit_port.text(), self.dlg.lineEdit_database.text(), self.dlg.lineEdit_user.text(), self.dlg.lineEdit_password.text())
+            self.dlg.comboBox_schema.clear()
             self.controller.populate_schema_combo_box(self.dlg.comboBox_schema)
             self.dlg.comboBox_table.clear()
+            self.iface.messageBar().pushMessage("Info", "Connection to database established.", level=QgsMessageBar.INFO, duration=5)
         except:
             e = sys.exc_info()[0]
-            self.iface.messageBar().pushMessage("Error", "Not able to query the schemata from the database. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
+            self.iface.messageBar().pushMessage("Error", "Not able to query the schemata from the database.", level=QgsMessageBar.CRITICAL, duration=3)
             QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
     
     def select_tables(self):
         try:
+            self.dlg.comboBox_table.clear()
             self.controller.populate_table_combo_box(self.dlg.comboBox_table, self.dlg.comboBox_schema.currentText())
         except:
             e = sys.exc_info()[0]

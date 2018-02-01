@@ -27,7 +27,7 @@ class PgcController:
 			combo_box.addItem(combo_item)
 		self.database.close_connection()
 	
-	def start_chainage(schema, table, id_column, geom_column, equidistance, crs, pb, create_new_layer):
+	def start_chainage(self, schema, table, id_column, geom_column, equidistance, crs, pb, create_new_layer):
 		#establishing a database connection
 		self.database.start_connection(self.gui)
 		
