@@ -66,16 +66,17 @@ class Db:
 						"current_number_of_point integer := 1;\n" +
 						"i record;\n" +
 						"BEGIN\n" +
-						"FOR i IN SELECT " + id_column + " as id_column, st_transform(" + geom_column + ", " + crs + ") as geom, st_length(st_transform(" + geom_column + ", " + crs + ")) as line_length FROM " + source_schema + "." + source_table + " WHERE " + id_column + " = " + id + " LOOP\n" +
+						"FOR i IN SELECT " + id_column + " as id_column, st_transform(" + geom_column + ", " + crs + ") as geom, st_length(st_transform(" + geom_column + ", " + crs + ")) as line_length FROM " + source_schema + "." + source_table + " WHERE " + id_column + " = " + str(id) + " LOOP\n" +
 						"current_fractional := 0.0;\n" +
 						 "WHILE current_fractional <= (1.0)::double precision LOOP\n" +
 						"INSERT INTO " + target_schema + "." + target_table + "(old_id, geom, number_on_line)\n" +
 						"VALUES(i.id_column, ST_LineInterpolatePoint(i.geom, current_fractional), current_number_of_point);\n" +
-						"current_fractional := current_fractional + (" + equidistance + " / i.line_length);\n" +
+						"current_fractional := current_fractional + (" + str(equidistance) + " / i.line_length);\n" +
 						"current_number_of_point := current_number_of_point + 1;\n" +
 						"END LOOP;\n" +
 						"END LOOP;\n" +
 						"END $chainage$")
+		print(chainage_sql)
 		self.cur.execute(chainage_sql)
 	
 	def create_target_schema_and_table(self, target_schema, target_table, source_schema, source_table, source_id_column, crs):

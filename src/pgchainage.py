@@ -74,6 +74,7 @@ class pgChainage:
         #connect signals and slots
         self.dlg.pushButton_connect_to_database.clicked.connect(self.connect_to_database)
         self.dlg.comboBox_schema.currentIndexChanged.connect(self.select_tables)
+        self.dlg.comboBox_table.currentIndexChanged.connect(self.clean_settings)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -194,7 +195,10 @@ class pgChainage:
 											   self.dlg.lineEdit_crs.text(),
 											   self.dlg.progressBar,
 											   self.dlg.checkBox_create_new_layer.isChecked())
-				self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^", level=QgsMessageBar.INFO, duration=5)
+				if self.dlg.checkBox_create_new_layer.isChecked():
+				    self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^", level=QgsMessageBar.INFO, duration=5)
+				else:
+				    self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^", level=QgsMessageBar.INFO)
 			except:
 				e = sys.exc_info()[0]
 				self.iface.messageBar().pushMessage("Error", "A problem occured. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
@@ -206,6 +210,7 @@ class pgChainage:
             self.dlg.comboBox_schema.clear()
             self.controller.populate_schema_combo_box(self.dlg.comboBox_schema)
             self.dlg.comboBox_table.clear()
+            self.clean_settings()
             self.iface.messageBar().pushMessage("Info", "Connection to database established.", level=QgsMessageBar.INFO, duration=5)
         except:
             e = sys.exc_info()[0]
@@ -215,8 +220,15 @@ class pgChainage:
     def select_tables(self):
         try:
             self.dlg.comboBox_table.clear()
+            self.clean_settings()
             self.controller.populate_table_combo_box(self.dlg.comboBox_table, self.dlg.comboBox_schema.currentText())
         except:
             e = sys.exc_info()[0]
             self.iface.messageBar().pushMessage("Error", "Not able to query the tables of the schema. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
             QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
+
+    def clean_settings(self):
+        self.dlg.lineEdit_id.setText("")
+        self.dlg.lineEdit_geom.setText("")
+        self.dlg.lineEdit_crs.setText("")
+        self.dlg.lineEdit_equidistance.setText("")
