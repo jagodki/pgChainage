@@ -51,7 +51,7 @@ class Db:
 		self.cur.execute(get_all_ids_sql)
 		rows = self.cur.fetchall()
 		all_ids = self.get_query_result_of_first_column(rows)
-		return allIds
+		return all_ids
 	
 	def get_query_result_of_first_column(self, rows):
 		result_list = []
@@ -59,23 +59,24 @@ class Db:
 			result_list.append(row[0])
 		return result_list
 	
-	def chainage_line(self, source_schema, source_table, id_column, geom_column, target_schema, target_table, equidistance, crs):
-		chainageSql =	("$DO$\n" +
-						"DECLARE" +
+	def chainage_line(self, source_schema, source_table, id_column, id, geom_column, target_schema, target_table, equidistance, crs):
+		chainage_sql =	("DO $chainage$\n" +
+						"DECLARE\n" +
 						"current_fractional double precision := 0.0;\n" +
 						"current_number_of_point integer := 1;\n" +
 						"i record;\n" +
 						"BEGIN\n" +
-						"FOR i IN SELECT " + id_column + " as id_column, st_transform(" + geom_column + ", " + crs + ") as geom, st_length(st_transform(" + geom_column + ", " + crs + ")) as line_length FROM " + source_table + "." + source_table + " LOOP\n" +
-						"WHILE current_fractional < line_length LOOP\n" + 
+						"FOR i IN SELECT " + id_column + " as id_column, st_transform(" + geom_column + ", " + crs + ") as geom, st_length(st_transform(" + geom_column + ", " + crs + ")) as line_length FROM " + source_schema + "." + source_table + " WHERE " + id_column + " = " + id + " LOOP\n" +
+						"current_fractional := 0.0;\n" +
+						 "WHILE current_fractional <= (1.0)::double precision LOOP\n" +
 						"INSERT INTO " + target_schema + "." + target_table + "(old_id, geom, number_on_line)\n" +
-						"VALUES(i.id_column, st_line_interpolate_point(i.geom, current_fractional, current_number_of_point));\n" +
-						"current_fractional := current_fractional + (equidistance / line_length);\n" +
+						"VALUES(i.id_column, ST_LineInterpolatePoint(i.geom, current_fractional), current_number_of_point);\n" +
+						"current_fractional := current_fractional + (" + equidistance + " / i.line_length);\n" +
 						"current_number_of_point := current_number_of_point + 1;\n" +
 						"END LOOP;\n" +
 						"END LOOP;\n" +
-						"$DO$")
-		self.cur.execute(chainageSql)
+						"END $chainage$")
+		self.cur.execute(chainage_sql)
 	
 	def create_target_schema_and_table(self, target_schema, target_table, source_schema, source_table, source_id_column, crs):
 		#first create the new schema

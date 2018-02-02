@@ -45,8 +45,8 @@ class PgcController:
 		
 		#now iterate over the IDs and create a chainage for every linestring
 		for id in list_of_ids:
-			self.database.chainage_line(schema, table, id_column, geom_column, chainage_schema, chainage_table, equidistance, crs)
-			pb.setValue(pb.getValue() + 1)
+			self.database.chainage_line(schema, table, id_column, id, geom_column, chainage_schema, chainage_table, equidistance, crs)
+			pb.setValue(pb.value + 1)
 		
 		#close database connection
 		self.database.close_connection()
