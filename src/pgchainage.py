@@ -20,7 +20,7 @@
  ***************************************************************************/
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtGui import QAction, QIcon, QMessageBox
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -185,24 +185,34 @@ class pgChainage:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-			try:
-				#start processing
-				self.controller.start_chainage(self.dlg.comboBox_schema.currentText(),
-											   self.dlg.comboBox_table.currentText(),
-											   self.dlg.lineEdit_id.text(),
-											   self.dlg.lineEdit_geom.text(),
-											   self.dlg.lineEdit_equidistance.text(),
-											   self.dlg.lineEdit_crs.text(),
-											   self.dlg.progressBar,
-											   self.dlg.checkBox_create_new_layer.isChecked())
-				if self.dlg.checkBox_create_new_layer.isChecked():
-				    self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^", level=QgsMessageBar.INFO, duration=5)
-				else:
-				    self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^", level=QgsMessageBar.INFO)
-			except:
-				e = sys.exc_info()[0]
-				self.iface.messageBar().pushMessage("Error", "A problem occured. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
-				QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
+            try:
+                #start processing
+                if (self.dlg.lineEdit_id.text() != ""
+                    and self.dlg.lineEdit_geom.text() != ""
+                    and self.dlg.lineEdit_equidistance.text() != ""
+                    and self.dlg.lineEdit_crs.text() != ""):
+                    self.controller.start_chainage(self.dlg.comboBox_schema.currentText(),
+                                               self.dlg.comboBox_table.currentText(),
+                                               self.dlg.lineEdit_id.text(),
+                                               self.dlg.lineEdit_geom.text(),
+                                               self.dlg.lineEdit_equidistance.text(),
+                                               self.dlg.lineEdit_crs.text(),
+                                               self.dlg.progressBar,
+                                               self.dlg.checkBox_create_new_layer.isChecked())
+                    if self.dlg.checkBox_create_new_layer.isChecked():
+                        self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^", level=QgsMessageBar.INFO, duration=5)
+                    else:
+                        self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^", level=QgsMessageBar.INFO)
+                else:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setText("Please fill in all text fields, to run the process.")
+                    msg.setWindowTitle("pgChainage")
+                    msg.exec_()
+            except:
+                e = sys.exc_info()[0]
+                self.iface.messageBar().pushMessage("Error", "A problem occured. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
+                QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
     
     def connect_to_database(self):
         try:
