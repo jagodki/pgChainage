@@ -20,7 +20,7 @@
  ***************************************************************************/
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon, QMessageBox
+from PyQt4.QtGui import QAction, QIcon, QMessageBox, QDialogButtonBox
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -28,7 +28,7 @@ from pgchainage_dialog import pgChainageDialog
 import os.path
 from qgis.gui import QgsMessageBar
 from qgis.core import QgsMessageLog
-import sys, traceback
+import sys, traceback, time
 # import own mdoules
 from src.pgc_controller import PgcController
 
@@ -68,13 +68,16 @@ class pgChainage:
         self.actions = []
         self.menu = self.tr(u'&pgChainage')
         self.controller = PgcController(self.iface)
+        
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'pgChainage')
         self.toolbar.setObjectName(u'pgChainage')
+        
         #connect signals and slots
         self.dlg.pushButton_connect_to_database.clicked.connect(self.connect_to_database)
         self.dlg.comboBox_schema.currentIndexChanged.connect(self.select_tables)
         self.dlg.comboBox_table.currentIndexChanged.connect(self.clean_settings)
+        self.dlg.button_box.button(QDialogButtonBox.Ok).clicked.connect(self.start_processing)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -182,16 +185,22 @@ class pgChainage:
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
-        result = self.dlg.exec_()
+        #result = self.dlg.exec_()
         # See if OK was pressed
-        if result:
-            try:
-                #start processing
-                if (self.dlg.lineEdit_id.text() != ""
-                    and self.dlg.lineEdit_geom.text() != ""
-                    and self.dlg.lineEdit_equidistance.text() != ""
-                    and self.dlg.lineEdit_crs.text() != ""):
-                    self.controller.start_chainage(self.dlg.comboBox_schema.currentText(),
+        #if result:
+        #    pass
+
+    def start_processing(self):
+        try:
+            #check that all line fields are filled in
+            if (self.dlg.lineEdit_id.text() != ""
+                and self.dlg.lineEdit_geom.text() != ""
+                and self.dlg.lineEdit_equidistance.text() != ""
+                and self.dlg.lineEdit_crs.text() != ""):
+                #save the start time
+                start_time = time.time()
+                
+                self.controller.start_chainage(self.dlg.comboBox_schema.currentText(),
                                                self.dlg.comboBox_table.currentText(),
                                                self.dlg.lineEdit_id.text(),
                                                self.dlg.lineEdit_geom.text(),
@@ -199,38 +208,61 @@ class pgChainage:
                                                self.dlg.lineEdit_crs.text(),
                                                self.dlg.progressBar,
                                                self.dlg.checkBox_create_new_layer.isChecked())
-                    if self.dlg.checkBox_create_new_layer.isChecked():
-                        self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^", level=QgsMessageBar.INFO, duration=5)
-                    else:
-                        self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^", level=QgsMessageBar.INFO)
+
+                #calculate the time the processing needed
+                needed_time = time.time() - start_time
+                
+                #duration of the messagebar depends on whether the result layer is imported into QGIS or not
+                if self.dlg.checkBox_create_new_layer.isChecked():
+                    self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^ - time: " + str(needed_time) + " sec", level=QgsMessageBar.INFO, duration=5)
                 else:
-                    msg = QMessageBox()
-                    msg.setIcon(QMessageBox.Information)
-                    msg.setText("Please fill in all text fields, to run the process.")
-                    msg.setWindowTitle("pgChainage")
-                    msg.exec_()
-            except:
-                e = sys.exc_info()[0]
-                self.iface.messageBar().pushMessage("Error", "A problem occured. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
-                QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
+                    self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^ - time: " + str(needed_time) + " sec", level=QgsMessageBar.INFO)
+            else:
+                #display a message box to inform the user, that not all fields are filled in
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Information)
+                msg.setText("Please fill in all text fields, to run the process.")
+                msg.setWindowTitle("pgChainage")
+                msg.exec_()
     
+            #close the dialog
+            self.dlg.close()
+        except:
+            e = sys.exc_info()[0]
+            self.iface.messageBar().pushMessage("Error", "A problem occured. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
+            QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
+
     def connect_to_database(self):
         try:
             self.controller.start_db_connection(self.dlg.lineEdit_host.text(), self.dlg.lineEdit_port.text(), self.dlg.lineEdit_database.text(), self.dlg.lineEdit_user.text(), self.dlg.lineEdit_password.text())
+            
+            #clear the combobox of schemas to prepare it for inserting new entries
             self.dlg.comboBox_schema.clear()
+            
+            #populate the combobox
             self.controller.populate_schema_combo_box(self.dlg.comboBox_schema)
+            
+            #clear the combo box of tables because the user changed the corresponding schema
             self.dlg.comboBox_table.clear()
+            
+            #clear all other following line fields
             self.clean_settings()
+            
+            #display the information, that a connection can be established
             self.iface.messageBar().pushMessage("Info", "Connection to database established.", level=QgsMessageBar.INFO, duration=5)
         except:
-            e = sys.exc_info()[0]
             self.iface.messageBar().pushMessage("Error", "Not able to query the schemata from the database.", level=QgsMessageBar.CRITICAL, duration=3)
             QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
     
     def select_tables(self):
         try:
+            #clear the combobx of tables to prepare it for inserting new entries
             self.dlg.comboBox_table.clear()
+            
+            #clear all following line fields
             self.clean_settings()
+            
+            #populate the combobox with the tables of the corresponding schema
             self.controller.populate_table_combo_box(self.dlg.comboBox_table, self.dlg.comboBox_schema.currentText())
         except:
             e = sys.exc_info()[0]
@@ -238,6 +270,7 @@ class pgChainage:
             QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
 
     def clean_settings(self):
+        #clear the entries of the following line fields
         self.dlg.lineEdit_id.setText("")
         self.dlg.lineEdit_geom.setText("")
         self.dlg.lineEdit_crs.setText("")

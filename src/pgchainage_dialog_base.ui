@@ -248,33 +248,17 @@
  <connections>
   <connection>
    <sender>button_box</sender>
-   <signal>accepted()</signal>
-   <receiver>pgChainageDialogBase</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>button_box</sender>
    <signal>rejected()</signal>
    <receiver>pgChainageDialogBase</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
+     <x>191</x>
+     <y>521</y>
     </hint>
     <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
+     <x>191</x>
+     <y>274</y>
     </hint>
    </hints>
   </connection>
