@@ -77,7 +77,7 @@ class pgChainage:
         self.dlg.pushButton_connect_to_database.clicked.connect(self.connect_to_database)
         self.dlg.comboBox_schema.currentIndexChanged.connect(self.select_tables)
         self.dlg.comboBox_table.currentIndexChanged.connect(self.clean_settings)
-        self.dlg.button_box.button(QDialogButtonBox.Ok).clicked.connect(self.start_processing)
+        self.dlg.pushButton_start_processing.clicked.connect(self.start_processing)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -212,11 +212,8 @@ class pgChainage:
                 #calculate the time the processing needed
                 needed_time = time.time() - start_time
                 
-                #duration of the messagebar depends on whether the result layer is imported into QGIS or not
-                if self.dlg.checkBox_create_new_layer.isChecked():
-                    self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^ - time: " + str(needed_time) + " sec", level=QgsMessageBar.INFO, duration=5)
-                else:
-                    self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^ - time: " + str(needed_time) + " sec", level=QgsMessageBar.INFO)
+                #inform the user that the processing ended
+                self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^ - time: " + str(needed_time) + " sec", level=QgsMessageBar.INFO, duration=120)
             else:
                 #display a message box to inform the user, that not all fields are filled in
                 msg = QMessageBox()

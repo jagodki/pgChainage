@@ -231,12 +231,21 @@
       </widget>
      </item>
      <item>
-      <widget class="QDialogButtonBox" name="button_box">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+      <widget class="QPushButton" name="pushButton_start_processing">
+       <property name="text">
+        <string>start processing</string>
        </property>
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -245,22 +254,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>button_box</sender>
-   <signal>rejected()</signal>
-   <receiver>pgChainageDialogBase</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>191</x>
-     <y>521</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>191</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
