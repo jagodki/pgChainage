@@ -239,8 +239,9 @@ class pgChainage:
             #populate the combobox
             self.controller.populate_schema_combo_box(self.dlg.comboBox_schema)
             
-            #clear the combo box of tables because the user changed the corresponding schema
+            #clear the combo box of tables and populate it because the user changed the corresponding schema
             self.dlg.comboBox_table.clear()
+            self.select_tables()
             
             #clear all other following line fields
             self.clean_settings()
