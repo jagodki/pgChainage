@@ -60,7 +60,7 @@ class Db:
         return result_list
     
     def chainage_line(self, source_schema, source_table, id_column, id, geom_column, target_schema, target_table, equidistance, crs):
-        chainage_sql =    ("DO $chainage$\n" +
+        chainage_sql = ("DO $chainage$\n" +
                         "DECLARE\n" +
                         "current_fractional double precision := 0.0;\n" +
                         "current_number_of_point integer := 1;\n" +
