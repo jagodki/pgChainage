@@ -7,6 +7,8 @@ This plugin converts a layer of line strings into a chain of points. The main wo
 ## Usage
 Usage: Just insert the parameters for the connection to your database (and connect with the database), than choose the schema and table (note: all available schemata and tables will be displayed), fill in the names of the ID- and geom-column, choose a CRS for the resulting point layer (a metric-CRS is recommended) and fill in an equidistance (if you choosed a metric-CRS, this values is in meters) - and start the processing.
 <img src="screenshots/plugin_usage.png" />
+<br>
+A new schema called <i>chainage</i> will be created and in this schema the chainaged layer will be stored. The new layer will be named like "name_of_linestring_layer"_chainage. <b>If a table with the same name already exists, the plugin will throw an exception.</b> The plugin will also throw an exception, if the user inserts names for the id- and/or geom-column, that do not exists in the database.
 <br> <br>
 <b>Important:</b>
 <br>
