@@ -59,7 +59,7 @@ class Db:
             result_list.append(row[0])
         return result_list
     
-    def chainage_line(self, source_schema, source_table, id_column, id, geom_column, target_schema, target_table, equidistance, crs):
+    def chainage_line(self, source_schema, source_table, id_column, id, geom_column, target_schema, target_table, equidistance, crs, end_point=False):
         chainage_sql = ("DO $chainage$\n" +
                         "DECLARE\n" +
                         "current_fractional double precision := 0.0;\n" +
@@ -68,18 +68,49 @@ class Db:
                         "BEGIN\n" +
                         "FOR i IN SELECT " + id_column + " as id_column, st_transform(" + geom_column + ", " + crs + ") as geom, st_length(st_transform(" + geom_column + ", " + crs + ")) as line_length FROM " + source_schema + "." + source_table + " WHERE " + id_column + " = " + str(id) + " LOOP\n" +
                         "current_fractional := 0.0;\n" +
-                         "WHILE current_fractional <= (1.0)::double precision LOOP\n" +
-                        "INSERT INTO " + target_schema + "." + target_table + "(old_id, geom, number_on_line)\n" +
+                        "WHILE current_fractional <= (1.0)::double precision LOOP\n" +
+                        "INSERT INTO " + target_schema + "." + target_table + "(old_edge_id, geom, number_on_line)\n" +
                         "VALUES(i.id_column, ST_LineInterpolatePoint(i.geom, current_fractional), current_number_of_point);\n" +
                         "current_fractional := current_fractional + (" + str(equidistance) + " / i.line_length);\n" +
                         "current_number_of_point := current_number_of_point + 1;\n" +
                         "END LOOP;\n" +
+                        "IF " + str(end_point) + " THEN\n" +
+                        "INSERT INTO " + target_schema + "." + target_table + "(old_edge_id, geom, number_on_line)\n" +
+                        "VALUES(i.id_column, ST_EndPoint(i.geom), current_number_of_point);\n" +
+                        "END IF;\n" +
                         "END LOOP;\n" +
                         "END $chainage$")
-        print(chainage_sql)
+        #print(chainage_sql)
         self.cur.execute(chainage_sql)
     
-    def create_target_schema_and_table(self, target_schema, target_table, source_schema, source_table, source_id_column, crs):
+    def substring_line(self, source_schema, source_table, id_column, id, geom_column, target_schema, target_table, equidistance, crs, end_edge=False):
+        chainage_sql = ("DO $split$\n" +
+                        "DECLARE\n" +
+                        "current_fractional double precision := 0.0;\n" +
+                        "next_fractional double precision := 0.0;\n" +
+                        "current_number_of_substring integer := 1;\n" +
+                        "i record;\n" +
+                        "BEGIN\n" +
+                        "FOR i IN SELECT " + id_column + " as id_column, st_transform(" + geom_column + ", " + crs + ") as geom, st_length(st_transform(" + geom_column + ", " + crs + ")) as line_length FROM " + source_schema + "." + source_table + " WHERE " + id_column + " = " + str(id) + " LOOP\n" +
+                        "current_fractional := 0.0;\n" +
+                        "next_fractional := current_fractional + (" + str(equidistance) + " / i.line_length);\n" +
+                        "WHILE next_fractional <= (1.0)::double precision LOOP\n" +
+                        "INSERT INTO " + target_schema + "." + target_table + "(old_edge_id, geom, number_on_line)\n" +
+                        "VALUES(i.id_column, ST_LineSubstring(i.geom, current_fractional, next_fractional), current_number_of_substring);\n" +
+                        "current_fractional := next_fractional;\n" +
+                        "next_fractional := current_fractional + (" + str(equidistance) + " / i.line_length);\n" +
+                                    "current_number_of_substring := current_number_of_substring + 1;\n" +
+                                    "END LOOP;\n" +
+                        "IF " + str(end_edge) + " THEN\n" +
+                        "INSERT INTO " + target_schema + "." + target_table + "(old_edge_id, geom, number_on_line)\n" +
+                        "VALUES(i.id_column, ST_LineSubstring(i.geom, current_fractional, 1.0), current_number_of_substring);\n" +
+                        "END IF;\n" +
+                        "END LOOP;\n" +
+                        "END $split$")
+        #print(chainage_sql)
+        self.cur.execute(chainage_sql)
+    
+    def create_target_schema_and_table(self, target_schema, target_point_table, target_line_table, source_schema, source_table, source_id_column, crs):
         #first create the new schema
         create_schema_sql = "CREATE SCHEMA IF NOT EXISTS " + target_schema + ";"
         self.cur.execute(create_schema_sql)
@@ -90,11 +121,18 @@ class Db:
         rows = self.cur.fetchall()
         data_type = rows[0][0]
         
-        #now create a new table
-        create_table_sql = "CREATE TABLE IF NOT EXISTS " + target_schema + "." + target_table + "(id serial PRIMARY KEY, old_id " + data_type + ", number_on_line integer);"
-        self.cur.execute(create_table_sql)
+        #now create new table(s)
+        if target_point_table != "":
+          create_table_sql = "CREATE TABLE IF NOT EXISTS " + target_schema + "." + target_point_table + "(id serial PRIMARY KEY, old_edge_id " + data_type + ", number_on_line integer);"
+          self.cur.execute(create_table_sql)
+        if target_line_table != "":
+          create_table_sql = "CREATE TABLE IF NOT EXISTS " + target_schema + "." + target_line_table + "(id serial PRIMARY KEY, old_edge_id " + data_type + ", number_on_line integer);"
+          self.cur.execute(create_table_sql)
         
-        #add a geometry column to the new table
-        add_geometry_column_sql = "SELECT addGeometryColumn('" + target_schema + "', '" + target_table + "', 'geom', " + crs + ", 'POINT', 2);"
-        self.cur.execute(add_geometry_column_sql)
-        
+            #add a geometry column to table(s)
+        if target_point_table != "":
+          add_geometry_column_sql = "SELECT addGeometryColumn('" + target_schema + "', '" + target_point_table + "', 'geom', " + crs + ", 'POINT', 2);"
+          self.cur.execute(add_geometry_column_sql)
+        if target_line_table != "":
+          add_geometry_column_sql = "SELECT addGeometryColumn('" + target_schema + "', '" + target_line_table + "', 'geom', " + crs + ", 'LINESTRING', 2);"
+          self.cur.execute(add_geometry_column_sql)

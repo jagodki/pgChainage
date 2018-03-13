@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>384</width>
-    <height>550</height>
+    <width>407</width>
+    <height>607</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -213,10 +213,17 @@
           </item>
          </layout>
         </item>
-        <item row="1" column="0">
+        <item row="2" column="0">
          <widget class="QCheckBox" name="checkBox_create_new_layer">
           <property name="text">
-           <string>load the new table as a layer into QGIS</string>
+           <string>load the new table(s) into QGIS</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="checkBox_end_geometries">
+          <property name="text">
+           <string>create end points/end segments of the linestrings </string>
           </property>
          </widget>
         </item>
@@ -224,16 +231,30 @@
       </widget>
      </item>
      <item>
-      <widget class="QProgressBar" name="progressBar">
-       <property name="value">
-        <number>0</number>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="pushButton_points">
+         <property name="text">
+          <string>create points</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_lines">
+         <property name="text">
+          <string>create line segments</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_start_processing">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
-        <string>start processing</string>
+        <string>create points and line segments</string>
        </property>
        <property name="checkable">
         <bool>false</bool>
@@ -241,11 +262,21 @@
        <property name="autoExclusive">
         <bool>false</bool>
        </property>
-       <property name="default">
+       <property name="autoDefault">
         <bool>true</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
        </property>
        <property name="flat">
         <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="progressBar">
+       <property name="value">
+        <number>0</number>
        </property>
       </widget>
      </item>

@@ -10,13 +10,19 @@
 name=pgChainage
 qgisMinimumVersion=2.0
 description=plugin for chainage linestrings of a table directly in PostgreSQL/PostGIS
-version=1.0
+version=1.1.0
 author=Christoph Jung
 email=jagodki.cj@gmail.com
 
 about=This plugin converts a layer of line strings into a chain of points. The main work takes place directly in the PostgreSQL-/PostGIS-database, i.e. big tables have not to be imported into QGIS before and during processing.
       _____
-      Usage: Just insert the parameters for the connection to your database, than choose the schema and table (note: all available schemata and tables will be displayed), fill in the names of the ID- and geom-column, choose a CRS for the resulting point layer (a metric-CRS is recommended) and fill in an equidistance (if you choosed a metric-CRS, this values is in meters) - and start the processing. A new schema called "chainage" will be created and in this schema the chainaged layer will be stored. The new layer will be named like "name_of_linestring_layer"_chainage. If a table with the same name already exists, the plugin will throw an exception. The plugin will also throw an exception, if the user inserts names for the id- and/or geom-column, that do not exists in the database.
+      Usage: Fill in the parameters for establishing a connection to the database. The DBMS has to be PostgreSQL, and the extension PostGIS must created before starting the processing.
+      _____
+      Press the "connect to database"-button. A Message Bar above the map window will appear and tells the user, whether a connection could established or not.
+      _____
+      Choose the table (and schema), which should be used for the chainage. The table must have a geometry column of the type LINESTRING. Then fill in the other fields. The CRS can differ from the CRS of the choosed geometry. The PlugIn calls the PostGIS-function ST_Transform(...) to project the geometries into the specified CRS; to state the CRS of the geometry-column is not necessary. It is recommended to specify a metric CRS. If the checkbox "calculate last point/last substring of lines" is checked, the endpoint and/or the last substring of each line will be calculated by ignoring the specified equidistance (just for the end-geometries) and inserted into the database.
+      _____
+      Their are three buttons to start the processing. The button "create points" just creates points along each line. The button "create substrings" just creates lines with the same specified distance from the input layer. The button "create points & substrings" starts both processings.
       _____
       Important: The plugin has been developed and tested using PostgreSQL 10 and PostGIS 2.4. Maybe it will not work with older versions of the named products, e.g. the chainage is realized by using the PostGIS-function ST_LineInterpolatePoint, which has the name ST_line_interpolate_point e.g. in PostGIS 2.1.
       _____
@@ -30,6 +36,7 @@ repository=https://github.com/jagodki/pgChainage
 
 # Uncomment the following line and add your changelog:
 changelog=
+	1.1.0 - add the possibility to create substrings of the input layer with an equidistance
 	1.0.0 - first release
 
 # Tags are comma separated with spaces allowed

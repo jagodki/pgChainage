@@ -27,37 +27,67 @@ class PgcController:
             combo_box.addItem(combo_item)
         self.database.close_connection()
     
-    def start_chainage(self, schema, table, id_column, geom_column, equidistance, crs, pb, create_new_layer):
+    def start_chainage(self,
+                       schema,
+                       table,
+                       id_column,
+                       geom_column,
+                       equidistance,
+                       crs,
+                       pb,
+                       create_new_layer,
+                       chainage,
+                       substring,
+                       end_geometries):
         #establishing a database connection
         self.database.start_connection(self.gui)
         
         #define the names of the new schema and table
-        chainage_schema = "chainage"
-        chainage_table = table + "_chainage"
+        pgchainage_schema = "pgchainage"
+        chainage_table = ""
+        substring_table = ""
+        if chainage:
+          chainage_table = table + "_chainage"
+        if substring:
+            substring_table = table + "_substring"
         
         #create the new schema and table
-        self.database.create_target_schema_and_table(chainage_schema, chainage_table, schema, table, id_column, crs)
-        
+        self.database.create_target_schema_and_table(pgchainage_schema, chainage_table, substring_table, schema, table, id_column, crs)
+
         #get IDs of all records in the source table and init the progressbar
         list_of_ids = self.database.get_all_ids(id_column, schema, table)
-        pb.setMaximum(len(list_of_ids))
-        pb.setValue(0)
-        QApplication.processEvents()
-        
-        #now iterate over the IDs and create a chainage for every linestring
-        for id in list_of_ids:
-            self.database.chainage_line(schema, table, id_column, id, geom_column, chainage_schema, chainage_table, equidistance, crs)
-            pb.setValue(pb.value() + 1)
+
+        if chainage and substring:
+            pb.setMaximum(len(list_of_ids) * 2)
+        elif chainage or substring:
+            pb.setMaximum(len(list_of_ids))
+            pb.setValue(0)
             QApplication.processEvents()
+        
+        #now iterate over the IDs and create a chainage and/or substring for every linestring
+        if chainage:
+            for id in list_of_ids:
+                self.database.chainage_line(schema, table, id_column, id, geom_column, pgchainage_schema, chainage_table, equidistance, crs, end_geometries)
+                pb.setValue(pb.value() + 1)
+                QApplication.processEvents()
+        if substring:
+            for id in list_of_ids:
+                self.database.substring_line(schema, table, id_column, id, geom_column, pgchainage_schema, substring_table, equidistance, crs, end_geometries)
+                pb.setValue(pb.value() + 1)
+                QApplication.processEvents()
         
         #close database connection
         self.database.close_connection()
         
-        #load the new table into QGIS
+        #load the new table(s) into QGIS
         if create_new_layer is True:
             uri = QgsDataSourceURI()
             uri.setConnection(self.database.host, self.database.port, self.database.database, self.database.user, self.database.password)
-            uri.setDataSource(chainage_schema, chainage_table, "geom")
-            layer = QgsVectorLayer(uri.uri(False), chainage_table, "postgres")
-            QgsMapLayerRegistry.instance().addMapLayer(layer)
-        
+        if chainage:
+            uri.setDataSource(pgchainage_schema, chainage_table, "geom")
+            chainage_layer = QgsVectorLayer(uri.uri(False), chainage_table, "postgres")
+            QgsMapLayerRegistry.instance().addMapLayer(chainage_layer)
+        if substring:
+            uri.setDataSource(pgchainage_schema, substring_table, "geom")
+            substring_layer = QgsVectorLayer(uri.uri(False), substring_table, "postgres")
+            QgsMapLayerRegistry.instance().addMapLayer(substring_layer)

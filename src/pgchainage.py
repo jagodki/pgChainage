@@ -77,7 +77,9 @@ class pgChainage:
         self.dlg.pushButton_connect_to_database.clicked.connect(self.connect_to_database)
         self.dlg.comboBox_schema.currentIndexChanged.connect(self.select_tables)
         self.dlg.comboBox_table.currentIndexChanged.connect(self.clean_settings)
-        self.dlg.pushButton_start_processing.clicked.connect(self.start_processing)
+        self.dlg.pushButton_start_processing.clicked.connect(self.start_points_and_lines_processing)
+        self.dlg.pushButton_points.clicked.connect(self.start_points_processing)
+        self.dlg.pushButton_lines.clicked.connect(self.start_lines_processing)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -189,8 +191,17 @@ class pgChainage:
         # See if OK was pressed
         #if result:
         #    pass
+        
+    def start_points_processing(self):
+        self.start_processing(True, False)
+    
+    def start_lines_processing(self):
+        self.start_processing(False, True)
+    
+    def start_points_and_lines_processing(self):
+        self.start_processing(True, True)
 
-    def start_processing(self):
+    def start_processing(self, points, lines):
         try:
             #check that all line fields are filled in
             if (self.dlg.lineEdit_id.text() != ""
@@ -199,6 +210,7 @@ class pgChainage:
                 and self.dlg.lineEdit_crs.text() != ""):
                 #save the start time
                 start_time = time.time()
+                print(str(points))
                 
                 self.controller.start_chainage(self.dlg.comboBox_schema.currentText(),
                                                self.dlg.comboBox_table.currentText(),
@@ -207,7 +219,10 @@ class pgChainage:
                                                self.dlg.lineEdit_equidistance.text(),
                                                self.dlg.lineEdit_crs.text(),
                                                self.dlg.progressBar,
-                                               self.dlg.checkBox_create_new_layer.isChecked())
+                                               self.dlg.checkBox_create_new_layer.isChecked(),
+                                               points,
+                                               lines,
+                                               self.dlg.checkBox_end_geometries.isChecked())
 
                 #calculate the time the processing needed
                 needed_time = time.time() - start_time
