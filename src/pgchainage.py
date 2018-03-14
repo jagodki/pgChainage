@@ -30,7 +30,7 @@ from qgis.gui import QgsMessageBar
 from qgis.core import QgsMessageLog
 import sys, traceback, time
 # import own mdoules
-from src.pgc_controller import PgcController
+from processing.pgc_controller import PgcController
 
 
 class pgChainage:
