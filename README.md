@@ -2,13 +2,16 @@
 QGIS-plugin for chainage linestrings of a table directly in PostgreSQL/PostGIS
 
 ## Goal of the project
-This plugin converts a layer of line strings into a chain of points. The main work takes place directly in the PostgreSQL-/PostGIS-database, i.e. big tables have not to be imported into QGIS before and during processing.
+This plugin converts a layer of line strings into a chain of points and or equidistance linestrings. The main work takes place directly in the PostgreSQL-/PostGIS-database, i.e. big tables have not to be imported into QGIS before and during processing.
 
 ## Usage
-Usage: Just insert the parameters for the connection to your database (and connect with the database), than choose the schema and table (note: all available schemata and tables will be displayed), fill in the names of the ID- and geom-column, choose a CRS for the resulting point layer (a metric-CRS is recommended) and fill in an equidistance (if you choosed a metric-CRS, this values is in meters) - and start the processing.
-<img src="screenshots/plugin_usage.png" />
+1. Fill in the parameters for establishing a connection to the database. The DBMS has to be PostgreSQL, and the extension PostGIS must created before starting the processing.<br>
+2. Press the "connect to database"-button. A Message Bar above the map window will appear and tells the user, whether a connection could established or not.<br>
+3. Choose the table (and schema), which should be used for the chainage. The table must have a geometry column of the type LINESTRING. Then fill in the other fields. The CRS can differ from the CRS of the choosed geometry. The PlugIn calls the PostGIS-function ST_Transform(...) to project the geometries into the specified CRS; to state the CRS of the geometry-column is not necessary. It is recommended to specify a metric CRS. If the checkbox "calculate last point/last substring of lines" is checked, the endpoint and/or the last substring of each line will be calculated by ignoring the specified equidistance (just for the end-geometries) and inserted into the database.<br>
+4. Their are three buttons to start the processing. The button "create points" just creates points along each line. The button "create substrings" just creates lines with the same specified distance from the input layer. The button "create points & substrings" starts both processings.
+<img src="screenshots/plugin_usage_110.png" />
 <br>
-A new schema called <i>chainage</i> will be created and in this schema the chainaged layer will be stored. The new layer will be named like "name_of_linestring_layer"_chainage. <b>If a table with the same name already exists, the plugin will throw an exception.</b> The plugin will also throw an exception, if the user inserts names for the id- and/or geom-column, that do not exists in the database.
+A new schema called <i>pgchainage</i> will be created and in this schema the chainaged layer(s) will be stored. The new layer(s) will be named like "name_of_linestring_layer"_chainage/"name_of_linestring_layer"_substring<b>If a table with the same name already exists, the plugin will throw an exception.</b> The plugin will also throw an exception, if the user inserts names for the id- and/or geom-column, that do not exists in the database.
 <br> <br>
 <b>Important:</b>
 <br>
