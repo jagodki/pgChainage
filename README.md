@@ -16,6 +16,7 @@ A new schema called <i>pgchainage</i> will be created and in this schema the cha
 <b>Important:</b>
 <br>
 The plugin has been developed and tested using PostgreSQL 10 and PostGIS 2.4. Maybe it will not work with older versions of the named products, e.g. the chainage is realized by using the PostGIS-function ST_LineInterpolatePoint, which has the name ST_line_interpolate_point e.g. in PostGIS 2.1 (look at line 73 in the file <i>db.py</i>):
+
 ```python
 chainage_sql = ("DO $chainage$\n" +
 "DECLARE\n" +
@@ -34,5 +35,6 @@ chainage_sql = ("DO $chainage$\n" +
 "END LOOP;\n" +
 "END $chainage$")
 ```
+
 ## Additional information:
 Source of the icon: Webalys - Kameleon Icons (http://www.kameleon.pics)
