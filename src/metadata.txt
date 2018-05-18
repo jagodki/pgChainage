@@ -8,9 +8,9 @@
 
 [general]
 name=pgChainage
-qgisMinimumVersion=2.0
+qgisMinimumVersion=3.0
 description=plugin for chainage linestrings of a table directly in PostgreSQL/PostGIS
-version=1.1.0
+version=2.0.0
 author=Christoph Jung
 email=jagodki.cj@gmail.com
 
@@ -36,6 +36,7 @@ repository=https://github.com/jagodki/pgChainage
 
 # Uncomment the following line and add your changelog:
 changelog=
+	2.0.0 - Upgrade to Qt5 for QGIS3 support
 	1.1.0 - add the possibility to create substrings of the input layer with an equidistance
 	1.0.0 - first release
 

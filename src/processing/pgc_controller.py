@@ -1,6 +1,7 @@
-import db
-from PyQt4.QtGui import QComboBox, QProgressBar, QApplication
-from qgis.core import QgsVectorLayer, QgsDataSourceURI, QgsMapLayerRegistry
+from . import db
+from PyQt5.QtWidgets import QComboBox, QProgressBar, QApplication
+#from qgis.core import QgsVectorLayer, QgsDataSourceURI, QgsMapLayerRegistry
+from qgis import *
 
 class PgcController:
     

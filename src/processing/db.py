@@ -24,10 +24,10 @@ class Db:
             self.cur = self.conn.cursor()
             
             #display information to the user
-            #gui.messageBar().pushMessage("Info", "Connection to database can be established.", level=QgsMessageBar.INFO, duration = 5)
+            #gui.messageBar().pushMessage("Info", "Connection to database can be established.", level=Qgis.Info, duration = 5)
         except:
-            gui.messageBar().pushMessage("Error", "Establishing a connection to the database with the given parameters failed.", level=QgsMessageBar.CRITICAL)
-            QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
+            gui.messageBar().pushMessage("Error", "Establishing a connection to the database with the given parameters failed.", level=Qgis.CRITICAL)
+            QgsMessageLog.logMessage(traceback.format_exc(), level=Qgis.Critical)
     
     def close_connection(self):
         self.conn.close()

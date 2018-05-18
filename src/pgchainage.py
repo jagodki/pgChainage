@@ -19,18 +19,19 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon, QMessageBox, QDialogButtonBox
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QAction, QMessageBox, QDialogButtonBox
 # Initialize Qt resources from file resources.py
-import resources
+from .resources import *
 # Import the code for the dialog
-from pgchainage_dialog import pgChainageDialog
+from .pgchainage_dialog import pgChainageDialog
 import os.path
 from qgis.gui import QgsMessageBar
 from qgis.core import QgsMessageLog
 import sys, traceback, time
 # import own mdoules
-from processing.pgc_controller import PgcController
+from .processing.pgc_controller import PgcController
 
 
 class pgChainage:
@@ -228,7 +229,7 @@ class pgChainage:
                 needed_time = time.time() - start_time
                 
                 #inform the user that the processing ended
-                self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^ - time: " + str(needed_time) + " sec", level=QgsMessageBar.INFO, duration=120)
+                self.iface.messageBar().pushMessage("Info", "Chainage finished ^o^ - time: " + str(needed_time) + " sec", level=Qgis.Success, duration=120)
             else:
                 #display a message box to inform the user, that not all fields are filled in
                 msg = QMessageBox()
@@ -241,7 +242,7 @@ class pgChainage:
             self.dlg.close()
         except:
             e = sys.exc_info()[0]
-            self.iface.messageBar().pushMessage("Error", "A problem occured. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
+            self.iface.messageBar().pushMessage("Error", "A problem occured. Look into QGIS-log for further information.", level=Qgis.Critical)
             QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
 
     def connect_to_database(self):
@@ -262,10 +263,10 @@ class pgChainage:
             self.clean_settings()
             
             #display the information, that a connection can be established
-            self.iface.messageBar().pushMessage("Info", "Connection to database established.", level=QgsMessageBar.INFO, duration=5)
+            self.iface.messageBar().pushMessage("Info", "Connection to database established.", level=Qgis.Info, duration=5)
         except:
             self.iface.messageBar().pushMessage("Error", "Not able to query the schemata from the database.", level=QgsMessageBar.CRITICAL, duration=3)
-            QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
+            QgsMessageLog.logMessage(traceback.format_exc(), level=Qgis.Critical)
     
     def select_tables(self):
         try:
@@ -279,8 +280,8 @@ class pgChainage:
             self.controller.populate_table_combo_box(self.dlg.comboBox_table, self.dlg.comboBox_schema.currentText())
         except:
             e = sys.exc_info()[0]
-            self.iface.messageBar().pushMessage("Error", "Not able to query the tables of the schema. Look into QGIS-log for further information.", level=QgsMessageBar.CRITICAL)
-            QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
+            self.iface.messageBar().pushMessage("Error", "Not able to query the tables of the schema. Look into QGIS-log for further information.", level=Qgis.Critical)
+            QgsMessageLog.logMessage(traceback.format_exc(), level=Qgis.Critical)
 
     def clean_settings(self):
         #clear the entries of the following line fields
