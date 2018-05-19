@@ -1,6 +1,6 @@
 import psycopg2, sys, traceback
 from qgis.gui import QgsMessageBar
-from qgis.core import QgsMessageLog
+from qgis.core import *
 
 class Db:
     

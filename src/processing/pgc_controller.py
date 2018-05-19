@@ -1,7 +1,8 @@
 from . import db
 from PyQt5.QtWidgets import QComboBox, QProgressBar, QApplication
-#from qgis.core import QgsVectorLayer, QgsDataSourceURI, QgsMapLayerRegistry
-from qgis import *
+#from qgis.core import QgsVectorLayer, QgsDataSourceUri, QgsMapLayerRegistry
+from qgis.core import *
+from qgis.gui import *
 
 class PgcController:
     
@@ -82,7 +83,7 @@ class PgcController:
         
         #load the new table(s) into QGIS
         if create_new_layer is True:
-            uri = QgsDataSourceURI()
+            uri = QgsDataSourceUri()
             uri.setConnection(self.database.host, self.database.port, self.database.database, self.database.user, self.database.password)
         if chainage:
             uri.setDataSource(pgchainage_schema, chainage_table, "geom")

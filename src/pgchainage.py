@@ -28,7 +28,7 @@ from .resources import *
 from .pgchainage_dialog import pgChainageDialog
 import os.path
 from qgis.gui import QgsMessageBar
-from qgis.core import QgsMessageLog
+from qgis.core import *
 import sys, traceback, time
 # import own mdoules
 from .processing.pgc_controller import PgcController
@@ -243,7 +243,7 @@ class pgChainage:
         except:
             e = sys.exc_info()[0]
             self.iface.messageBar().pushMessage("Error", "A problem occured. Look into QGIS-log for further information.", level=Qgis.Critical)
-            QgsMessageLog.logMessage(traceback.format_exc(), level=QgsMessageLog.CRITICAL)
+            QgsMessageLog.logMessage(traceback.format_exc(), level=Qgis.Critical)
 
     def connect_to_database(self):
         try:
@@ -265,7 +265,7 @@ class pgChainage:
             #display the information, that a connection can be established
             self.iface.messageBar().pushMessage("Info", "Connection to database established.", level=Qgis.Info, duration=5)
         except:
-            self.iface.messageBar().pushMessage("Error", "Not able to query the schemata from the database.", level=QgsMessageBar.CRITICAL, duration=3)
+            self.iface.messageBar().pushMessage("Error", "Not able to query the schemata from the database.", level=Qgis.Critical, duration=3)
             QgsMessageLog.logMessage(traceback.format_exc(), level=Qgis.Critical)
     
     def select_tables(self):
