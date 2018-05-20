@@ -211,7 +211,6 @@ class pgChainage:
                 and self.dlg.lineEdit_crs.text() != ""):
                 #save the start time
                 start_time = time.time()
-                print(str(points))
                 
                 self.controller.start_chainage(self.dlg.comboBox_schema.currentText(),
                                                self.dlg.comboBox_table.currentText(),

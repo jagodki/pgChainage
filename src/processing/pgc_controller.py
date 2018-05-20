@@ -2,7 +2,6 @@ from . import db
 from PyQt5.QtWidgets import QComboBox, QProgressBar, QApplication
 #from qgis.core import QgsVectorLayer, QgsDataSourceUri, QgsMapLayerRegistry
 from qgis.core import *
-from qgis.gui import *
 
 class PgcController:
     
@@ -88,8 +87,8 @@ class PgcController:
         if chainage:
             uri.setDataSource(pgchainage_schema, chainage_table, "geom")
             chainage_layer = QgsVectorLayer(uri.uri(False), chainage_table, "postgres")
-            QgsMapLayerRegistry.instance().addMapLayer(chainage_layer)
+            QgsProject.instance().addMapLayer(chainage_layer)
         if substring:
             uri.setDataSource(pgchainage_schema, substring_table, "geom")
             substring_layer = QgsVectorLayer(uri.uri(False), substring_table, "postgres")
-            QgsMapLayerRegistry.instance().addMapLayer(substring_layer)
+            QgsProject.instance().addMapLayer(substring_layer)
