@@ -4,6 +4,11 @@ QGIS-plugin for chainage linestrings of a table directly in PostgreSQL/PostGIS
 ## Goal of the project
 This plugin converts a layer of line strings into a chain of points and or equidistance linestrings. The main work takes place directly in the PostgreSQL-/PostGIS-database, i.e. big tables have not to be imported into QGIS before and during processing.
 
+## Changelog
+2.0.0 - Upgrade to Qt5 for QGIS3 support
+1.1.0 - add the possibility to create substrings of the input layer with an equidistance
+1.0.0 - first release
+
 ## Usage
 1. Fill in the parameters for establishing a connection to the database. The DBMS has to be PostgreSQL, and the extension PostGIS must created before starting the processing.<br>
 2. Press the "connect to database"-button. A Message Bar above the map window will appear and tells the user, whether a connection could established or not.<br>
